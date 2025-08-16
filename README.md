@@ -7,7 +7,8 @@ It uses an **I²C OLED display** for rendering the game, with no RTOS or externa
 ## Hardware
 - **MCU:** AtMega328P 
 - **Display:** OLED (I²C interface)
-- **Input:** GPIO buttons (Up, Down, Left, Right, Select) 
+- **Input:** GPIO buttons (Up, Down, Left, Right, Select)
+- **Flashing:** USBASP
 
 
 This project is designed as a **stepping stone** for anyone beginning their journey in embedded systems. 
