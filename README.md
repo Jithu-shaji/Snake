@@ -23,7 +23,7 @@ By building this game, you will gain practical exposure to:
 ![USBASP Programmer](Images/USBASP.JPG)
 
 
-###I2C
+##I2C
 
 The ATmega328p data sheet section 21 explains the working of I2C with the resister details in the MCU.
 We are using the TWCR,TWSR,TWDR registers for controlling I2C communication from ATmega328p.
