@@ -3,7 +3,7 @@
 
 uint8_t i2cStart();
 void i2cStop();
-void i2cWrite(uint8_t data);
+uint8_t i2cWrite(uint8_t data);
 void i2cRead(uint8_t data);
 
 #endif
