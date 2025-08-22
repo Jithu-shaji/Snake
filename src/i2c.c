@@ -4,7 +4,7 @@
 #include "i2c.h"
 #include "Std_types.h"
 
-
+uint8_t data = 0;
 
 uint8_t i2cStart()
 {
@@ -74,7 +74,7 @@ uint8_t i2cRead(uint8_t SlaveAddr)
 {
     uint8_t Status = 0;
     uint8_t retVal = E_NOT_OK;
-    uint8_t data = 0;
+    
     /*Initiate start condition*/
     retVal = i2cStart();
     
@@ -100,7 +100,7 @@ uint8_t i2cRead(uint8_t SlaveAddr)
             /* Send NACK since we are reading only 1 byte */
             if (DATA_ACK_R == Status || DATA_NACK_R == Status)
             {
-                data = TWDR; /*TO DO : pass data as pointer*/
+                data = TWDR;
                 retVal = E_OK;
             }
         }       
@@ -117,5 +117,5 @@ uint8_t i2cRead(uint8_t SlaveAddr)
     /*Initiate stop condition*/
     I2C_STOP();
     
-    return data;   
+    return retVal;   
 }
