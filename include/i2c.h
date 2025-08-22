@@ -39,7 +39,14 @@
 
 /*masking last two prescaler and unused bits*/
 #define STAT_MASK 0xF8
+/*Possible prescalar values*/
+#define PRE_SCL_ONE 0x00
+#define PRE_SCL_FOUR 0x01
+#define PRE_SCL_SIXTEEN 0x02
+#define PRE_SCL_SIXTYFOUR 0x03
 
+
+void i2cInit(uint32_t freq, uint8_t prescl);
 uint8_t i2cStart();
 uint8_t i2cWrite(uint8_t data);
 uint8_t i2cRead(uint8_t SlaveAddr);

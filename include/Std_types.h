@@ -1,9 +1,10 @@
 #ifndef STD_TYPES_H
 #define STD_TYPES_H
 
-#define E_NACK 2
-#define E_OK 1
-#define E_NOT_OK 0
+/*Error definitions*/
+#define E_NACK 2U
+#define E_OK 1U
+#define E_NOT_OK 0U
 
 
 
