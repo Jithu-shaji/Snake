@@ -58,7 +58,7 @@ uint8_t i2cWrite(uint8_t data)
 {
     uint8_t Status = 0;
     uint8_t retVal = E_NOT_OK;
-    uint8_t retry = 0;
+    uint8_t retry = 3;
      /*Check if retry count exceeded*/
     while(retry > 0)
     {
@@ -80,33 +80,35 @@ uint8_t i2cWrite(uint8_t data)
             if (ARBT_FAIL == Status) 
             {   
                 retry--;
-                _delay_us(10);      
+                _delay_us(10); 
+                retVal = E_ARBLOST;
                 continue;           
             }     
             /*Check status register value for write Acknowledgment state*/
             else if((ADDR_ACK_W == Status) || (DATA_ACK_W == Status))
             {
+                /*stopping further re-transmission*/
+                retry = 0;
+                /*Initiate stop condition*/
+                I2C_STOP();
                 retVal = E_OK;
             }  
             else if((ADDR_NACK_W == Status) || (DATA_NACK_W == Status))
             {
+                I2C_STOP();
                 retVal = E_NACK;
             } 
             else
             {
-                /*Do Nothing*/ 
+                I2C_STOP(); 
             }
         }
         else 
         {
             /*Do Nothing*/ 
         }
-        /*stopping further re-transmission*/
-        retry = 0;
+        
     }
-    /*Initiate stop condition*/
-    I2C_STOP();
-    
     return retVal;
 }
 
@@ -150,29 +152,28 @@ uint8_t i2cRead(uint8_t SlaveAddr)
                 /* Send NACK since we are reading only 1 byte */
                 if (DATA_ACK_R == Status || DATA_NACK_R == Status)
                 {
-                    data = TWDR;
+                    data = TWDR; /*TO DO : Multiple byte receive logic*/                    
+                    /*stopping further re-transmission*/
+                    retry = 0;
+                    /*Initiate stop condition*/
+                    I2C_STOP();
                     retVal = E_OK;
                 }
             }       
             else if(ADDR_NACK_R == Status)
             {
+                I2C_STOP();
                 retVal = E_NACK;
             }
             else
             {
-                /*Do Nothing*/ 
+                I2C_STOP();               
             }
         }
         else
         {
             /*Do Nothing*/ 
-        }
-        /*stopping further re-transmission*/
-        retry = 0;
-    }
-    
-    /*Initiate stop condition*/
-    I2C_STOP();
-    
+        }             
+    }           
     return retVal;   
 }
