@@ -12,19 +12,19 @@ void i2cInit(uint32_t freq, uint8_t prescl)
     switch (prescl)
     {
         case 1:
-            TWSR = PRE_SCL_ONE;
+            TWSR = (TWSR & STAT_MASK) | PRE_SCL_ONE;
             break;
         case 4:
-            TWSR = PRE_SCL_FOUR;
+            TWSR = (TWSR & STAT_MASK) | PRE_SCL_FOUR;
             break;
         case 16:
-            TWSR = PRE_SCL_SIXTEEN;
+            TWSR = (TWSR & STAT_MASK) | PRE_SCL_SIXTEEN;
             break;
         case 64:
-            TWSR = PRE_SCL_SIXTYFOUR;
+            TWSR = (TWSR & STAT_MASK) | PRE_SCL_SIXTYFOUR;
             break;
         default: 
-            TWSR = PRE_SCL_ONE;
+            TWSR = (TWSR & STAT_MASK) | PRE_SCL_ONE;
             break;              
     }
     /*Calculating i2c bit rate*/
@@ -32,22 +32,32 @@ void i2cInit(uint32_t freq, uint8_t prescl)
 }
 
 
-uint8_t i2cStart()
+uint8_t i2cStart(void)
 {
     uint8_t retVal = E_NOT_OK;
+    uint16_t timeout = 10000;
 
     /*Setting register values for transmitting I2C START condition*/
     TWCR = (1 << TWINT) | (1<<TWSTA) | (1<<TWEN);
-    /*Starting watchdog to prevent infinite looping*/
-    wdt_enable(WDTO_60MS);
     /*TWINT will be updated as 0 after START condition is transmitted*/
-    while (!(TWCR & (1<<TWINT))); 
-    /*Disable watchdog on loop exit*/
-    wdt_disable();
+    while (!(TWCR & (1 << TWINT)))
+    {
+        if (--timeout == 0)
+        {
+            /*release bus*/
+            I2C_STOP();    
+            return E_TIMEOUT;
+        }
+    }
     /*Checking TWSR register with masking last two prescaler and unused bits*/
     if(START_OK == (TWSR & STAT_MASK))
     {
         retVal = E_OK;
+    }
+    else
+    {
+        /*Initiate stop condition*/
+        I2C_STOP();
     }
     
     return retVal;
@@ -58,57 +68,46 @@ uint8_t i2cWrite(uint8_t data)
 {
     uint8_t Status = 0;
     uint8_t retVal = E_NOT_OK;
-    uint8_t retry = 3;
+    uint8_t retry = RETRY_CNT;
      /*Check if retry count exceeded*/
     while(retry > 0)
     {
-        /*Initiate start condition*/
-        retVal = i2cStart();
-        
-        if (E_OK == retVal)
+        /*Loading Data to be transmitted to TWDR register*/
+        TWDR = data;
+        /*Setting register values for initiating transmission*/
+        TWCR = (1<<TWINT) | (1<<TWEN);
+        /*Wait till the TWINT bit gets set after transmission completed*/
+        while (!(TWCR & (1<<TWINT)));        
+        /*Masking TWSR register Prescalar to get status data*/
+        Status = TWSR & STAT_MASK;
+        /*Check Arbitration lost*/
+        if (ARBT_FAIL == Status) 
+        {   
+            retry--;
+            _delay_us(10); 
+            retVal = E_ARBLOST;
+            continue;           
+        }     
+        /*Check status register value for write Acknowledgment state*/
+        else if((ADDR_ACK_W == Status) || (DATA_ACK_W == Status))
+        {                         
+            retVal = E_OK;
+            /*stopping further re-transmission*/ 
+            break;
+        }  
+        else if((ADDR_NACK_W == Status) || (DATA_NACK_W == Status))
+        {          
+            retry--;
+            retVal = E_NACK;
+            continue;
+        } 
+        else
         {
-            /*Loading Data to be transmitted to TWDR register*/
-            TWDR = data;
-            /*Setting register values for initiating transmission*/
-            TWCR = (1<<TWINT) | (1<<TWEN);
-            /*Wait till the TWINT bit gets set after transmission completed*/
-            while (!(TWCR & (1<<TWINT)));
-            
-            /*Masking TWSR register Prescalar to get status data*/
-            Status = TWSR & STAT_MASK;
-            /*Check Arbitration lost*/
-            if (ARBT_FAIL == Status) 
-            {   
-                retry--;
-                _delay_us(10); 
-                retVal = E_ARBLOST;
-                continue;           
-            }     
-            /*Check status register value for write Acknowledgment state*/
-            else if((ADDR_ACK_W == Status) || (DATA_ACK_W == Status))
-            {
-                /*stopping further re-transmission*/
-                retry = 0;
-                /*Initiate stop condition*/
-                I2C_STOP();
-                retVal = E_OK;
-            }  
-            else if((ADDR_NACK_W == Status) || (DATA_NACK_W == Status))
-            {
-                I2C_STOP();
-                retVal = E_NACK;
-            } 
-            else
-            {
-                I2C_STOP(); 
-            }
+            I2C_STOP(); 
+            break;
         }
-        else 
-        {
-            /*Do Nothing*/ 
-        }
-        
     }
+   
     return retVal;
 }
 
@@ -116,64 +115,57 @@ uint8_t i2cRead(uint8_t SlaveAddr)
 {
     uint8_t Status = 0;
     uint8_t retVal = E_NOT_OK;
-    uint8_t retry = 3;
+    uint8_t retry = RETRY_CNT;
     
     /*Check if retry count exceeded*/
     while(retry > 0)
     {
-        /*Initiate start condition*/
-        retVal = i2cStart();
-        if (E_OK == retVal)
+        /*Loading slave adder from which to be received to TWDR register*/
+        TWDR = SlaveAddr;
+        /*Setting register values for initiating transmission*/
+        TWCR = (1<<TWINT) | (1<<TWEN);
+        /*Wait till the TWINT bit gets set after transmission completed*/
+        while (!(TWCR & (1<<TWINT)));
+        
+        /*Masking TWSR register Prescalar to get status data*/
+        Status = TWSR & STAT_MASK;
+        /*Check Arbitration lost*/
+        if (ARBT_FAIL == Status) 
+        {   
+            retry--;
+            _delay_us(10);  
+            retVal = E_ARBLOST;
+            continue;           
+        }
+        /*Check status register value for read Acknowledgment state*/
+        else if(ADDR_ACK_R == Status)
         {
-            /*Loading slave adder from which to be received to TWDR register*/
-            TWDR = SlaveAddr;
-            /*Setting register values for initiating transmission*/
+            /* Send NACK since we are reading only 1 byte */
             TWCR = (1<<TWINT) | (1<<TWEN);
-            /*Wait till the TWINT bit gets set after transmission completed*/
             while (!(TWCR & (1<<TWINT)));
-            
-            /*Masking TWSR register Prescalar to get status data*/
-            Status = TWSR & STAT_MASK;
-            /*Check Arbitration lost*/
-            if (ARBT_FAIL == Status) 
-            {   
-                retry--;
-                _delay_us(10);      
-                continue;           
-            }
-            /*Check status register value for read Acknowledgment state*/
-            else if(ADDR_ACK_R == Status)
-            {
-                /* Send NACK since we are reading only 1 byte */
-                TWCR = (1<<TWINT) | (1<<TWEN);
-                while (!(TWCR & (1<<TWINT)));
 
-                Status = TWSR & STAT_MASK;
-                /* Send NACK since we are reading only 1 byte */
-                if (DATA_ACK_R == Status || DATA_NACK_R == Status)
-                {
-                    data = TWDR; /*TO DO : Multiple byte receive logic*/                    
-                    /*stopping further re-transmission*/
-                    retry = 0;
-                    /*Initiate stop condition*/
-                    I2C_STOP();
-                    retVal = E_OK;
-                }
-            }       
-            else if(ADDR_NACK_R == Status)
+            Status = TWSR & STAT_MASK;
+            /* Send NACK since we are reading only 1 byte */
+            if (DATA_ACK_R == Status || DATA_NACK_R == Status)
             {
-                I2C_STOP();
-                retVal = E_NACK;
+                data = TWDR; /*TO DO : Multiple byte receive logic*/               
+                /*Initiate stop condition*/
+                retVal = E_OK;
+                /*stopping further re-transmission*/
+                break;
             }
-            else
-            {
-                I2C_STOP();               
-            }
+        }       
+        else if(ADDR_NACK_R == Status)
+        {
+            retry--;
+            retVal = E_NACK;
+            continue;
         }
         else
         {
-            /*Do Nothing*/ 
-        }             
-    }           
+            I2C_STOP();
+            break;
+        }
+    }                      
     return retVal;   
 }

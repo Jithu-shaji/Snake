@@ -9,6 +9,8 @@
 
 #define READ  1
 #define WRITE 0
+/*Number of times to retry*/
+#define RETRY_CNT 3
 
 /*Status Codes for Master Transmitter Mode*/
 
@@ -47,7 +49,7 @@
 
 
 void i2cInit(uint32_t freq, uint8_t prescl);
-uint8_t i2cStart();
+uint8_t i2cStart(void);
 uint8_t i2cWrite(uint8_t data);
 uint8_t i2cRead(uint8_t SlaveAddr);
 
