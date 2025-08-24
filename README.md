@@ -14,7 +14,7 @@ By building this game, you will gain practical exposure to:
 
 ## Hardware
 - **MCU:** AtMega328P 
-- **Display:** SSD1306 OLED (I²C interface)
+- **Display:** SH1106 OLED (I²C interface)
 <img src="Images/SSD1306.JPG" alt="OLED Display" width="300"/>
   
 - **Flashing:** USBASP
