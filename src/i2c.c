@@ -106,6 +106,7 @@ uint8_t i2cWrite(uint8_t data)
             I2C_STOP(); 
             break;
         }
+        
     }
    
     return retVal;
