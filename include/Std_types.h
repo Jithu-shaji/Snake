@@ -8,4 +8,6 @@
 #define E_OK      1U
 #define E_NOT_OK  0U
 
+#define INITVAL  0U
+
 #endif

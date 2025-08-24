@@ -14,13 +14,17 @@
 /*Next byte is data or command*/
 #define COMMAND 0x00
 #define DATA 0x40
+#define SET 1
+#define CLR 0
 
 /* -------- PUBLIC APIs -------- */
 
 void sh1106_command(uint8_t cmd);
 void sh1106_command_buffer(uint8_t* cmd, uint8_t length);
 void sh1106_data(uint8_t data);
+void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t color);
 void sh1106_update_screen(void);
+
 
 void sh1106_init(void);
 void sh1106_clear(void);

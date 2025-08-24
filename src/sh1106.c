@@ -3,7 +3,7 @@
 #include "i2c.h"
 #include "sh1106.h"
 
-uint8_t sh1106_buffer[SH1106_WIDTH * SH1106_HEIGHT / 8] = {0};
+uint8_t sh1106_buffer[SH1106_WIDTH * (SH1106_HEIGHT / 8)] = {0};
   
 void sh1106_command_buffer(uint8_t* cmd, uint8_t length)
 {
@@ -50,7 +50,6 @@ void sh1106_update_screen(void)
         sh1106_command(0x02);          // Lower column start (low nibble)
         sh1106_command(0x10);          // Upper column start (high nibble)
 
-  
         i2cStart();
         i2cWrite(SLA_RW(SH1106_ADDR, WRITE));  // Device address + Write
         i2cWrite(DATA);                         
@@ -93,13 +92,13 @@ void sh1106_fill( )
     sh1106_update_screen();
 }
 
-void sh1106_drawPixel(uint8_t x, uint8_t y, uint8_t color)
+void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t color)
 {
     if (x >= SH1106_WIDTH || y >= SH1106_HEIGHT) {
         return; // Out of bounds
     }
 
-    uint16_t byteIndex = x + (y / 8) * SH1106_WIDTH;
+    uint16_t byteIndex = ((y / 8) * SH1106_WIDTH) + x;
     uint8_t bitMask = 1 << (y % 8);
 
     if (color) {
