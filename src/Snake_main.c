@@ -8,8 +8,13 @@
 
 extern uint8_t sh1106_buffer[SH1106_WIDTH * (SH1106_HEIGHT / 8)];
 uint8_t grow_len = 0;
-uint8_t snake_PosX = 20;
-uint8_t snake_PosY = 20;
+uint8_t snake_tailX = 20;
+uint8_t snake_tailY = 20;
+
+uint8_t snake_headX = 25;
+uint8_t snake_headY = 20;
+
+uint8_t delay = 1000;
 
 void SetBorder(void)
 {
@@ -35,31 +40,49 @@ void SetBorder(void)
     sh1106_update_screen();
 }
 
-void SetSnake(void)
-{
-       
-    for(int i = snake_PosX; i <= (snake_PosX + INIT_LEN); i++)
+void InitSnake(void)
+{     
+    for(int i = snake_tailX; i <= (snake_headX); i++)
     {
-        sh1106_Pixel(i,snake_PosY,SET);    
+        sh1106_Pixel(i,snake_headY,SET);    
     }
+    
     sh1106_update_screen();
 }
 
 void SnakeMove(void)
 {
+    
     while(1)
     {
-        if(SH1106_WIDTH - 1 > snake_PosX)
-        {
-            sh1106_Pixel(snake_PosX,snake_PosY,CLR);
-            snake_PosX++;
-            SetSnake();
+        /*Moving the snake from its current position*/
+        if(SH1106_WIDTH - 1 > snake_headX)
+        {                      
+            /*Clearing tail pixel after checking if its border pixels*/
+            if((0 != snake_tailX) || (SH1106_WIDTH == snake_tailX))
+                sh1106_Pixel(snake_tailX,snake_tailY,CLR);
+            snake_tailX++;
+            /*reset tail to one when tail reaches boarder pixel*/
+            if(SH1106_WIDTH-1 == snake_tailX)
+                snake_tailX = 1;
+            sh1106_update_screen();
+            /*Adding head pixel*/
+            snake_headX++; 
+            /*Setting head pixel after checking if its border pixels*/
+            if((0 != snake_headX) || (SH1106_WIDTH == snake_headX))
+                sh1106_Pixel(snake_headX,snake_headY,SET);
+            sh1106_update_screen();
         }
         else
         {
-          snake_PosX = INITVAL + 1;
-          SetSnake();
+          /*Start from other end after boarder is reached*/
+          snake_headX = 0;
+          sh1106_update_screen();
         }
+        /*Difficulty increases when delay is decreased*/
+        _delay_ms(100);
+       
+        
     }
 }
 
@@ -74,7 +97,7 @@ int main(void)
     sh1106_clear();
     _delay_ms(10);
     SetBorder();
-    SetSnake();
+    InitSnake();
     SnakeMove();
 
 }
