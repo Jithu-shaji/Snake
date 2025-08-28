@@ -23,9 +23,84 @@ By building this game, you will gain practical exposure to:
 - **Input:** GPIO buttons (Up, Down, Left, Right, Select)
 
 
-## I2C
+## I²C on ATmega328P
 
+The ATmega328P has a built-in Two-Wire Interface (TWI) module, which implements the I²C protocol.
 The ATmega328p data sheet section 21 explains the working of I2C with the resister details in the MCU.
-We are using the TWCR,TWSR,TWDR registers for controlling I2C communication from ATmega328p.
 
-SH1106 Display data sheet explain the command and data format for filling the display RAM.
+#### Communication is controlled through a set of registers:
+
+
+- TWBR (TWI Bit Rate Register): Sets the SCL clock frequency along with prescaler bits.
+
+- TWSR (TWI Status Register): Contains status codes for monitoring I²C events (start sent, data acknowledged, etc.) and prescaler settings.
+
+- TWDR (TWI Data Register): Holds the data to be transmitted or received.
+
+- TWCR (TWI Control Register): Used to enable I²C, generate START/STOP conditions, acknowledge reception, and initiate data transfers.
+
+- TWAR (TWI Address Register): Holds the slave address when the MCU operates as a slave.
+
+#### Basic workflow for I²C master transmit:
+
+- Set START condition using TWCR.
+
+- Wait for TWINT flag (operation complete).
+
+- Load the slave address + R/W bit into TWDR, send, and wait for ACK.
+
+- Send control byte (command/data select).
+
+- Send command(s) or data byte(s) as needed.
+
+- Issue STOP condition.
+
+## SH1106 OLED Controller
+
+The SH1106 is a graphic display driver IC designed to control a 128×64 pixel monochrome OLED panel.
+
+#### 1. Memory Organization
+
+- The SH1106 has 132 × 64 bits of internal display RAM.
+
+- Only 128 × 64 pixels are visible on the screen — the extra 4 columns are hidden (commonly requiring a column offset of 2 when writing data).
+
+- The RAM is divided into 8 pages (page 0 → page 7).
+
+- Each page = 128 columns × 8 rows of pixels.
+
+- Each byte in RAM controls 8 vertical pixels (1 bit = 1 pixel ON/OFF).
+
+So instead of addressing each pixel individually, you write one byte at a time that maps to 8 vertical pixels in the display.
+
+#### 2. Display Update Process
+
+To draw on the screen, you:
+
+- Select a page address (0xB0–0xB7).
+
+- Set the column address (low + high nibble).
+
+- Send data bytes → each byte lights up a column of 8 vertical pixels in that page.
+
+Example:
+
+Sending 0xFF to a column → all 8 pixels in that column are ON.
+
+Sending 0x00 → all 8 pixels are OFF.
+
+Sending 0b10101010 → alternating ON/OFF pixels.
+
+#### 3. Commands vs Data
+
+Commands configure the display:
+
+Turn ON/OFF (0xAF / 0xAE)
+
+Set contrast (0x81)
+
+Set addressing/page (0xB0–0xB7)
+
+Scroll, inversion, display offset, etc.
+
+Data represents actual pixel information to be written into display RAM.
