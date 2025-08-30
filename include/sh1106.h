@@ -1,5 +1,5 @@
-#ifndef SSD1306_H_
-#define SSD1306_H_
+#ifndef SSD1306_H
+#define SSD1306_H
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -17,7 +17,6 @@
 #define SET 1
 #define CLR 0
 
-/* -------- PUBLIC APIs -------- */
 
 void sh1106_command(uint8_t cmd);
 void sh1106_command_buffer(uint8_t* cmd, uint8_t length);
@@ -30,4 +29,4 @@ void sh1106_init(void);
 void sh1106_clear(void);
 void sh1106_fill(void);
 
-#endif /* SSD1306_H_ */
+#endif // SSD1306_H

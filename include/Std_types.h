@@ -10,4 +10,4 @@
 
 #define INITVAL  0U
 
-#endif
+#endif //STD_TYPES_H

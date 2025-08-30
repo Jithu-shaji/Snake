@@ -15,9 +15,11 @@ By building this game, you will gain practical exposure to:
 ## Hardware
 - **MCU:** AtMega328P 
 - **Display:** SH1106 OLED (I²C interface)
+
 <img src="Images/SH1106.JPG" alt="OLED Display" width="300"/>
   
 - **Flashing:** USBASP
+
  <img src="Images/USBASP.JPG" alt="USBASP Programmer" width="300"/>
  
 - **Input:** GPIO buttons (Up, Down, Left, Right, Select)

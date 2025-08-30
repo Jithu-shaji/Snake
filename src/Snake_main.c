@@ -5,6 +5,7 @@
 #include "game_types.h"
 #include "i2c.h"  
 #include "sh1106.h"
+#include "button.h"
 
 extern uint8_t sh1106_buffer[SH1106_WIDTH * (SH1106_HEIGHT / 8)];
 uint8_t grow_len = 0;

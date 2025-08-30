@@ -53,4 +53,4 @@ uint8_t i2cStart(void);
 uint8_t i2cWrite(uint8_t data);
 uint8_t i2cRead(uint8_t SlaveAddr);
 
-#endif
+#endif //I2C_H

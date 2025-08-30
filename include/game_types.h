@@ -8,4 +8,4 @@ void SetSnake(void);
 void SnakeMove(void);
 
 
-#endif
+#endif //GAME_TYPES_H
