@@ -8,6 +8,7 @@
 #include "button.h"
 
 extern uint8_t sh1106_buffer[SH1106_WIDTH * (SH1106_HEIGHT / 8)];
+extern volatile uint8_t keypress;
 uint8_t grow_len = 0;
 uint8_t snake_tailX = 20;
 uint8_t snake_tailY = 20;
@@ -53,22 +54,45 @@ void InitSnake(void)
 
 void SnakeMove(void)
 {
-    
     while(1)
     {
         /*Moving the snake from its current position*/
         if(SH1106_WIDTH - 1 > snake_headX)
-        {                      
+        {
+            switch (keypress)
+            {
+                case UP:
+                    snake_headY++;
+                    snake_tailX++;
+                    break;
+                case DOWN:
+                    snake_headY--;
+                    snake_tailX++;
+                    break;
+                case RIGHT:
+                    snake_headX++;
+                    snake_tailX++;
+                    break;
+                case LEFT:
+                    snake_headX--;
+                    snake_tailX++;
+                    break;
+                default:
+                    snake_headX++;
+                    snake_tailX++;
+                    break;
+
+            }
             /*Clearing tail pixel after checking if its border pixels*/
             if((0 != snake_tailX) || (SH1106_WIDTH == snake_tailX))
                 sh1106_Pixel(snake_tailX,snake_tailY,CLR);
-            snake_tailX++;
+            //snake_tailX++;
             /*reset tail to one when tail reaches boarder pixel*/
             if(SH1106_WIDTH-1 == snake_tailX)
                 snake_tailX = 1;
             sh1106_update_screen();
             /*Adding head pixel*/
-            snake_headX++; 
+            //snake_headX++;
             /*Setting head pixel after checking if its border pixels*/
             if((0 != snake_headX) || (SH1106_WIDTH == snake_headX))
                 sh1106_Pixel(snake_headX,snake_headY,SET);

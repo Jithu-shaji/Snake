@@ -7,6 +7,12 @@
 #define LOW     0
 #define HIGH    1
 
+#define LEFT 1
+#define RIGHT 2
+#define UP 3
+#define DOWN 4
+#define SELECT 5
+
 void SetPort(volatile uint8_t* DDRx, uint8_t Dir);
 void SetPin(volatile uint8_t *port, uint8_t pin, uint8_t value);
 uint8_t GetPin(volatile uint8_t* port, uint8_t pin);

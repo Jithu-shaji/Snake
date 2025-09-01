@@ -92,7 +92,7 @@ void sh1106_fill( )
     sh1106_update_screen();
 }
 
-void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t color)
+void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t mode)
 {
     if (x >= SH1106_WIDTH || y >= SH1106_HEIGHT) {
         return; // Out of bounds
@@ -101,7 +101,7 @@ void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t color)
     uint16_t byteIndex = ((y / 8) * SH1106_WIDTH) + x;
     uint8_t bitMask = 1 << (y % 8);
 
-    if (color) {
+    if (mode) {
         sh1106_buffer[byteIndex] |= bitMask;   // Set pixel ON
     } else {
         sh1106_buffer[byteIndex] &= ~bitMask;  // Set pixel OFF
