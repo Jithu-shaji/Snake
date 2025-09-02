@@ -13,8 +13,9 @@
 #define DOWN 4
 #define SELECT 5
 
-void SetPort(volatile uint8_t* DDRx, uint8_t Dir);
+void SetDir(volatile uint8_t* DDRx, uint8_t Dir);
 void SetPin(volatile uint8_t *port, uint8_t pin, uint8_t value);
 uint8_t GetPin(volatile uint8_t* port, uint8_t pin);
+void Int0_int();
 
 #endif //SNAKE_BUTTON_H
