@@ -23,8 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4f48303a-a788-4085-b4e6-2191ad0c846b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/include/button.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/button.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/button.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/button.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -160,7 +160,7 @@
       <workItem from="1756545104234" duration="2000" />
       <workItem from="1756545121989" duration="4000" />
       <workItem from="1756545219226" duration="1637000" />
-      <workItem from="1756547902218" duration="14238000" />
+      <workItem from="1756547902218" duration="16535000" />
     </task>
     <servers />
   </component>

@@ -1,7 +1,8 @@
 # Bare-Metal Snake Game on AtMega328P
 
 This project is a **bare-metal implementation** of the classic **Nokia Snake game**, written for the **AtMega328P microcontroller**. 
-It uses an **I²C OLED display** for rendering the game, with no RTOS or external libraries — making it a perfect hands-on project for learning embedded systems fundamentals.
+It uses an **I²C OLED display** for rendering the game, with no RTOS or external libraries — making it a perfect 
+hands-on project for learning embedded systems fundamentals.
 
 This project is designed as a **stepping stone** for anyone beginning their journey in embedded systems. 
 By building this game, you will gain practical exposure to:
@@ -106,3 +107,32 @@ Set addressing/page (0xB0–0xB7)
 Scroll, inversion, display offset, etc.
 
 Data represents actual pixel information to be written into display RAM.
+
+
+## Button interface
+You can use the INT0 external interrupt on the ATmega328P to interface with a push button.
+
+#### INT0
+
+INT0 is the external interrupt connected to pin PD2 (Digital Pin 2 on an Arduino). This interrupt is highly flexible and
+can be configured to trigger on four different types of edge/level changes:
+
+   Low level: The interrupt is continuously triggered as long as the PD2 pin is low.
+
+   Logical change: The interrupt is triggered on any logical change, whether it's a transition from low to high or high to low.
+
+   Falling edge: The interrupt is triggered specifically when the pin voltage drops from high to low.
+
+   Rising edge: The interrupt is triggered specifically when the pin voltage rises from low to high.
+
+**Configuration**
+
+To set up INT0 as a push button interface, you need to configure two main registers:
+
+**EICRA** :
+This register determines the trigger condition. For a falling-edge trigger, you must set the ISC01 bit to 1 and 
+the ISC00 bit to 0. This tells the microcontroller to fire the interrupt only when the PD2 pin voltage falls.
+
+**EIMSK** :
+This register enables the specific interrupt. To enable INT0, you must set the INT0 bit to 1. Without this, 
+the interrupt will not be active even if the trigger condition is met.
