@@ -83,19 +83,13 @@ void SnakeMove(void)
                     break;
 
             }
-            /*Clearing tail pixel after checking if its border pixels*/
-            if((0 != snake_tailX) || (SH1106_WIDTH == snake_tailX))
-                sh1106_Pixel(snake_tailX,snake_tailY,CLR);
-            //snake_tailX++;
-            /*reset tail to one when tail reaches boarder pixel*/
-            if(SH1106_WIDTH-1 == snake_tailX)
-                snake_tailX = 1;
-            sh1106_update_screen();
             /*Adding head pixel*/
-            //snake_headX++;
             /*Setting head pixel after checking if its border pixels*/
             if((0 != snake_headX) || (SH1106_WIDTH == snake_headX))
                 sh1106_Pixel(snake_headX,snake_headY,SET);
+            //sh1106_update_screen();
+            /*Clearing tail pixel after checking if its border pixels*/
+            clearTail();
             sh1106_update_screen();
         }
         else
@@ -108,6 +102,53 @@ void SnakeMove(void)
         _delay_ms(100);
        
         
+    }
+}
+
+void clearTail(void)
+{
+    uint8_t left = INITVAL;
+    uint8_t right = INITVAL;
+    uint8_t top = INITVAL;
+    uint8_t bottom = INITVAL;
+
+    for (int i = 0; i < (SH1106_WIDTH * (SH1106_HEIGHT / 8)); i++)
+    {
+        int x = i % SH1106_WIDTH;
+        int y = (i / SH1106_WIDTH) * 8;
+
+        /* Omit border x */
+        if (x > 0 && x < (SH1106_WIDTH - 1))
+        {
+            /* Check if byte is not set */
+            if (sh1106_buffer[i] != 0x00)
+            {
+                for (int j = y; j < (y + 8) && j < SH1106_HEIGHT; j++)
+                {
+                    /* Omit border y */
+                    if (j > 0 && j < (SH1106_HEIGHT - 1))
+                    {
+                        if (sh1106_GetPixel(x, j)) // pixel ON
+                        {
+                            left   = sh1106_GetPixel(x-1, j);
+                            right  = sh1106_GetPixel(x+1, j);
+                            top    = sh1106_GetPixel(x, j-1);
+                            bottom = sh1106_GetPixel(x, j+1);
+                            if ((left + right + top + bottom) == 1)
+                            {
+                                /*Check its not head pixel*/
+                                if (!(x == snake_headX && j == snake_headY))
+                                {
+                                    /* found tail, clear tail */
+                                    sh1106_Pixel(x,j,CLR);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

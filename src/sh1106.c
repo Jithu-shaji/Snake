@@ -3,6 +3,8 @@
 #include "i2c.h"
 #include "sh1106.h"
 
+#include "Std_types.h"
+
 uint8_t sh1106_buffer[SH1106_WIDTH * (SH1106_HEIGHT / 8)] = {0};
   
 void sh1106_command_buffer(uint8_t* cmd, uint8_t length)
@@ -94,19 +96,42 @@ void sh1106_fill( )
 
 void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t mode)
 {
-    if (x >= SH1106_WIDTH || y >= SH1106_HEIGHT) {
-        return; // Out of bounds
-    }
+    uint16_t byteIndex = INITVAL;
+    uint8_t bitMask = INITVAL;
+    if (x <= SH1106_WIDTH && y <= SH1106_HEIGHT)
+    {
+        byteIndex = ((y / 8) * SH1106_WIDTH) + x;
+        bitMask = 1 << (y % 8);
 
-    uint16_t byteIndex = ((y / 8) * SH1106_WIDTH) + x;
-    uint8_t bitMask = 1 << (y % 8);
-
-    if (mode) {
-        sh1106_buffer[byteIndex] |= bitMask;   // Set pixel ON
-    } else {
-        sh1106_buffer[byteIndex] &= ~bitMask;  // Set pixel OFF
+        if (mode) {
+            sh1106_buffer[byteIndex] |= bitMask;   // Set pixel ON
+        } else {
+            sh1106_buffer[byteIndex] &= ~bitMask;  // Set pixel OFF
+        }
     }
 }
 
+uint8_t sh1106_GetPixel(uint8_t x, uint8_t y)
+{
+    uint16_t byteIndex = INITVAL;
+    uint8_t bitMask = INITVAL;
+    uint8_t retVal = 0;
+
+    if (x <= SH1106_WIDTH && y <= SH1106_HEIGHT)
+    {
+        byteIndex = ((y / 8) * SH1106_WIDTH) + x;
+        bitMask = 1 << (y % 8);
+
+        if (sh1106_buffer[byteIndex] & bitMask)
+        {
+            retVal =  1; // Pixel is ON
+        }
+        else
+        {
+            retVal = 0; // Pixel is OFF
+        }
+    }
+    return retVal;
+}
 
 

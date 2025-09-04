@@ -22,6 +22,7 @@ void sh1106_command(uint8_t cmd);
 void sh1106_command_buffer(uint8_t* cmd, uint8_t length);
 void sh1106_data(uint8_t data);
 void sh1106_Pixel(uint8_t x, uint8_t y, uint8_t mode);
+uint8_t sh1106_GetPixel(uint8_t x, uint8_t y);
 void sh1106_update_screen(void);
 
 
