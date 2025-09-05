@@ -63,23 +63,18 @@ void SnakeMove(void)
             {
                 case UP:
                     snake_headY++;
-                    snake_tailX++;
                     break;
                 case DOWN:
                     snake_headY--;
-                    snake_tailX++;
                     break;
                 case RIGHT:
                     snake_headX++;
-                    snake_tailX++;
                     break;
                 case LEFT:
                     snake_headX--;
-                    snake_tailX++;
                     break;
                 default:
                     snake_headX++;
-                    snake_tailX++;
                     break;
 
             }
@@ -141,6 +136,7 @@ void clearTail(void)
                                 {
                                     /* found tail, clear tail */
                                     sh1106_Pixel(x,j,CLR);
+
                                     return;
                                 }
                             }

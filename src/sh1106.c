@@ -117,7 +117,7 @@ uint8_t sh1106_GetPixel(uint8_t x, uint8_t y)
     uint8_t bitMask = INITVAL;
     uint8_t retVal = 0;
 
-    if (x <= SH1106_WIDTH && y <= SH1106_HEIGHT)
+    if (x > 0 && x < SH1106_WIDTH && y > 0 && y < SH1106_HEIGHT)
     {
         byteIndex = ((y / 8) * SH1106_WIDTH) + x;
         bitMask = 1 << (y % 8);
