@@ -116,7 +116,7 @@ uint8_t sh1106_GetPixel(uint8_t x, uint8_t y)
     uint16_t byteIndex = INITVAL;
     uint8_t bitMask = INITVAL;
     uint8_t retVal = 0;
-
+    /* Boundary value check */
     if (x > 0 && x < SH1106_WIDTH && y > 0 && y < SH1106_HEIGHT)
     {
         byteIndex = ((y / 8) * SH1106_WIDTH) + x;
@@ -130,6 +130,11 @@ uint8_t sh1106_GetPixel(uint8_t x, uint8_t y)
         {
             retVal = 0; // Pixel is OFF
         }
+    }
+    else
+    {
+        /* Consider outside bound pixels are ON */
+        retVal =  1; // Pixel is ON
     }
     return retVal;
 }

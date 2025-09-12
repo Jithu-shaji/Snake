@@ -6,7 +6,7 @@
 void SetBorder(void);
 void SetSnake(void);
 void SnakeMove(void);
-void clearTail(void);
+void GetTail(void);
 
 
 #endif //GAME_TYPES_H

@@ -13,7 +13,7 @@ uint8_t grow_len = 0;
 uint8_t snake_tailX = 20;
 uint8_t snake_tailY = 20;
 
-uint8_t snake_headX = 25;
+uint8_t snake_headX = 35;
 uint8_t snake_headY = 20;
 
 uint8_t delay = 1000;
@@ -80,11 +80,12 @@ void SnakeMove(void)
             }
             /*Adding head pixel*/
             /*Setting head pixel after checking if its border pixels*/
-            if((0 != snake_headX) || (SH1106_WIDTH == snake_headX))
+            if((0 != snake_headX) || (SH1106_WIDTH != snake_headX))
                 sh1106_Pixel(snake_headX,snake_headY,SET);
             //sh1106_update_screen();
             /*Clearing tail pixel after checking if its border pixels*/
-            clearTail();
+            GetTail();
+            sh1106_Pixel(snake_tailX, snake_tailY, CLR);
             sh1106_update_screen();
         }
         else
@@ -100,7 +101,7 @@ void SnakeMove(void)
     }
 }
 
-void clearTail(void)
+void GetTail(void)
 {
     uint8_t left = INITVAL;
     uint8_t right = INITVAL;
@@ -112,34 +113,52 @@ void clearTail(void)
         int x = i % SH1106_WIDTH;
         int y = (i / SH1106_WIDTH) * 8;
 
-        /* Omit border x */
-        if (x > 0 && x < (SH1106_WIDTH - 1))
+        /* Check if byte is not set */
+        if (sh1106_buffer[i] != 0x00)
         {
-            /* Check if byte is not set */
-            if (sh1106_buffer[i] != 0x00)
+            for (int j = y; j < (y + 8) && j < SH1106_HEIGHT; j++)
             {
-                for (int j = y; j < (y + 8) && j < SH1106_HEIGHT; j++)
+                if (sh1106_GetPixel(x, j)) // pixel ON
                 {
-                    /* Omit border y */
-                    if (j > 0 && j < (SH1106_HEIGHT - 1))
+                    left   = sh1106_GetPixel(x-1, j);
+                    right  = sh1106_GetPixel(x+1, j);
+                    top    = sh1106_GetPixel(x, j-1);
+                    bottom = sh1106_GetPixel(x, j+1);
+                    // if ((SH1106_WIDTH-1 == x) || (1 == x))
+                    // {
+                    //     left = 0;
+                    //     right = 0;
+                    // }
+                    // if ((SH1106_HEIGHT-1 == j) || (1 == j))
+                    // {
+                    //     top = 0;
+                    //     bottom = 0;
+                    // }
+                    if ((left + right + top + bottom) == 1)
                     {
-                        if (sh1106_GetPixel(x, j)) // pixel ON
+                        /*Check its not head pixel*/
+                        if (!(x == snake_headX && j == snake_headY))
                         {
-                            left   = sh1106_GetPixel(x-1, j);
-                            right  = sh1106_GetPixel(x+1, j);
-                            top    = sh1106_GetPixel(x, j-1);
-                            bottom = sh1106_GetPixel(x, j+1);
-                            if ((left + right + top + bottom) == 1)
-                            {
-                                /*Check its not head pixel*/
-                                if (!(x == snake_headX && j == snake_headY))
-                                {
-                                    /* found tail, clear tail */
-                                    sh1106_Pixel(x,j,CLR);
+                            /* found tail, clear tail */
+                            /* Omit border */
+                            //if ((0 != x && SH1106_WIDTH - 1 != x) && (0 != j && SH1106_HEIGHT - 1 != j ))
+                            //{
+                            snake_tailX = x;
+                            snake_tailY = j;
 
-                                    return;
-                                }
-                            }
+                            if (x == 0)
+                                snake_tailX = SH1106_WIDTH - 2;   // tail at left border → clear right edge
+                            else if (x == SH1106_WIDTH - 2)
+                                snake_tailX = 2;                   // tail at right border → clear left edge
+
+                            if (j == 0)
+                                snake_tailY = SH1106_HEIGHT - 1;  // tail at top border → clear bottom edge
+                            else if (j == SH1106_HEIGHT - 2)
+                                snake_tailY = 2;                  // tail at bottom border → clear top edge
+
+                            //sh1106_Pixel(snake_tailX, snake_tailY, CLR);
+                            return;
+
                         }
                     }
                 }
